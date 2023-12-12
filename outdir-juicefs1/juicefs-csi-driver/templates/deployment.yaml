@@ -1,0 +1,51 @@
+---
+# Source: juicefs-csi-driver/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    helm.sh/chart: juicefs-csi-driver-0.19.4
+    app.kubernetes.io/name: juicefs-csi-driver
+    app.kubernetes.io/instance: juicefs1
+    app.kubernetes.io/version: "0.23.1"
+    app.kubernetes.io/managed-by: Helm
+  name: juicefs-csi-dashboard
+  namespace: "kube-system"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: juicefs-csi-dashboard
+      app.kubernetes.io/name: juicefs-csi-driver
+      app.kubernetes.io/instance: juicefs1
+  template:
+    metadata:
+      labels:
+        app: juicefs-csi-dashboard
+        app.kubernetes.io/name: juicefs-csi-driver
+        app.kubernetes.io/instance: juicefs1
+    spec:
+      serviceAccountName: juicefs-csi-dashboard-sa
+      containers:
+        - name: dashboard
+          image: juicedata/csi-dashboard:v0.23.1
+          args:
+          - --static-dir=/dist
+          env:
+            - name: SYS_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - containerPort: 8088
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists

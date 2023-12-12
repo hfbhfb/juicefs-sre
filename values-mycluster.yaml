@@ -1,0 +1,24 @@
+sidecars:
+  livenessProbeImage:
+    repository: dyrnq/livenessprobe
+    tag: "v1.1.0"
+    pullPolicy: ""
+  nodeDriverRegistrarImage:
+    repository: dyrnq/csi-node-driver-registrar
+    tag: "v2.1.0"
+    pullPolicy: ""
+  csiProvisionerImage:
+    repository: dyrnq/csi-provisioner
+    tag: "v1.6.0"
+    pullPolicy: ""
+  csiResizerImage:
+    repository: dyrnq/csi-resizer
+    tag: "v1.0.1"
+    pullPolicy: ""
+
+
+mountMode: sidecar
+
+dashboard:
+  service:
+    type: NodePort

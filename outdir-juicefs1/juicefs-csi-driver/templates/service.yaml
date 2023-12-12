@@ -1,0 +1,48 @@
+---
+# Source: juicefs-csi-driver/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: juicefs-admission-webhook
+  namespace: "kube-system"
+  labels:
+    app.kubernetes.io/component: service
+    helm.sh/chart: juicefs-csi-driver-0.19.4
+    app.kubernetes.io/name: juicefs-csi-driver
+    app.kubernetes.io/instance: juicefs1
+    app.kubernetes.io/version: "0.23.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ports:
+    - name: https-rest
+      port: 443
+      targetPort: 9444
+  selector:
+    app: juicefs-csi-controller
+    app.kubernetes.io/name: juicefs-csi-driver
+    app.kubernetes.io/instance: juicefs1
+---
+# Source: juicefs-csi-driver/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: juicefs-csi-dashboard
+  namespace: "kube-system"
+  labels:
+    app.kubernetes.io/component: dashboard
+    helm.sh/chart: juicefs-csi-driver-0.19.4
+    app.kubernetes.io/name: juicefs-csi-driver
+    app.kubernetes.io/instance: juicefs1
+    app.kubernetes.io/version: "0.23.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: NodePort
+  ports:
+    - port: 8088
+      targetPort: 8088
+      protocol: TCP
+      name: http
+  selector:
+    app: juicefs-csi-dashboard
+    app.kubernetes.io/name: juicefs-csi-driver
+    app.kubernetes.io/instance: juicefs1
