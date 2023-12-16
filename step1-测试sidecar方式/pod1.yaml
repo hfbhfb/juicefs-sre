@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: my-dep2
-  name: my-dep2
+    app: my-juice-step1
+  name: my-juice-step1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-dep2
+      app: my-juice-step1
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: my-dep2
+        app: my-juice-step1
     spec:
       containers:
       - image: nginx

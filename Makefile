@@ -1,11 +1,11 @@
 
 
-
-install-sidecar:
+# 默认安装方式
+install:
 	@echo "install"	
 	kubectl apply -f ./juicefs-csi-sidecar.yaml
 
-uninstall-sidecar:
+uninstall:
 	@echo "uninstall"	
 	kubectl delete -f ./juicefs-csi-sidecar.yaml
 
@@ -26,10 +26,10 @@ get:
 helmAppName=juicefs1
 
 
-install:
+install-helm:
 	helm install juicefs-csi-driver/ --namespace kube-system --values ./values-mycluster.yaml --name-template ${helmAppName}
 
-uninstall:
+uninstall-helm:
 	helm uninstall ${helmAppName} --namespace kube-system 
 
 template:
