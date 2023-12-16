@@ -20,5 +20,14 @@ spec:
       containers:
       - image: nginx
         name: nginx
-        resources: {}
-status: {}
+        command:
+        - sh
+        - "-c"
+        - "while true; do date >> /datadir/1.txt; sleep 1; done "
+        volumeMounts:
+        - mountPath: /datadir
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: ce-static

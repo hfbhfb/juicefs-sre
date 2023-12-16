@@ -1,0 +1,156 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    cni.projectcalico.org/containerID: e31a0f2c4517989b3dee4059f42621f9cc5a7683d8993623f980df567e752603
+    cni.projectcalico.org/podIP: 10.0.137.86/32
+    cni.projectcalico.org/podIPs: 10.0.137.86/32
+  creationTimestamp: "2023-12-12T17:44:30Z"
+  generateName: my-juice-step1-67f679ccc7-
+  labels:
+    app: my-juice-step1
+    done.sidecar.juicefs.com/inject: "true"
+    pod-template-hash: 67f679ccc7
+  name: my-juice-step1-67f679ccc7-blzq8
+  namespace: default
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: my-juice-step1-67f679ccc7
+    uid: 3fcf3a96-2fbf-4b5c-a371-8cc6e76d2233
+  resourceVersion: "339658"
+  uid: f5518602-a033-426e-bcbb-3a0634bc9dec
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - |-
+      /usr/local/bin/juicefs format --storage=minio --bucket=http://minio.default --access-key=password --secret-key=${secretkey} ${metaurl} minio
+      /bin/mount.juicefs ${metaurl} /jfs/zexjez -o metrics=0.0.0.0:9567
+    env:
+    - name: JFS_FOREGROUND
+      value: "1"
+    envFrom:
+    - secretRef:
+        name: ce-static-jfs-secret
+    image: juicedata/mount:ce-v1.1.1
+    imagePullPolicy: IfNotPresent
+    lifecycle:
+      postStart:
+        exec:
+          command:
+          - bash
+          - -c
+          - time subpath= name=minio capacity=10485760 community=ce quotaPath= /check_mount.sh
+            '/jfs/zexjez' >> /proc/1/fd/1
+      preStop:
+        exec:
+          command:
+          - sh
+          - -c
+          - umount /jfs/zexjez && rmdir /jfs/zexjez
+    name: jfs-mount
+    ports:
+    - containerPort: 9567
+      name: metrics
+      protocol: TCP
+    resources:
+      limits:
+        cpu: "2"
+        memory: 5Gi
+      requests:
+        cpu: "1"
+        memory: 1Gi
+    securityContext:
+      privileged: true
+      runAsUser: 0
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /jfs
+      mountPropagation: Bidirectional
+      name: jfs-dir
+    - mountPath: /etc/updatedb.conf
+      name: updatedb
+    - mountPath: /var/jfsCache
+      name: cachedir-0
+    - mountPath: /check_mount.sh
+      name: jfs-check-mount
+      subPath: check_mount.sh
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-7ttm8
+      readOnly: true
+  - image: nginx
+    imagePullPolicy: Always
+    name: nginx
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /datadir
+      name: data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-7ttm8
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: master1
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - hostPath:
+      path: /var/lib/juicefs/volume/zexjez
+      type: ""
+    name: data
+  - name: kube-api-access-7ttm8
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+  - hostPath:
+      path: /var/lib/juicefs/volume
+      type: DirectoryOrCreate
+    name: jfs-dir
+  - hostPath:
+      path: /etc/updatedb.conf
+      type: FileOrCreate
+    name: updatedb
+  - hostPath:
+      path: /var/jfsCache
+      type: DirectoryOrCreate
+    name: cachedir-0
+  - name: jfs-check-mount
+    secret:
+      defaultMode: 493
+      secretName: ce-static-jfs-secret

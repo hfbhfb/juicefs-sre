@@ -10,6 +10,13 @@ make uninstall-sidecar
 
 
 
+## 静态配置的示例
+https://juicefs.com/docs/zh/csi/guide/pv/#static-provisioning
+
+
+
+
+
 
 ## 注!!!：sidecar方式部署，不能用helm
 ## 注!!!：sidecar方式部署，不能用helm
