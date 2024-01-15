@@ -1,3 +1,3 @@
 
 install:
-	kubectl apply -f secret.yaml
+	kubectl apply -f secret-pv-pvc.yaml

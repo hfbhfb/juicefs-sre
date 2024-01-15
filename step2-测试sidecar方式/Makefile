@@ -2,9 +2,9 @@
 # NS=ns-juicefs-test1
 NS=default
 
-status:
-	kubectl get po -n  ${NS}
-	kubectl get ns  ${NS} -oyaml
+# status:
+# 	kubectl get po -n  ${NS}
+# 	kubectl get ns  ${NS} -oyaml
 
 install:
 	-kubectl create ns ${NS}
